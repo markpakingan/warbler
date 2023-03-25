@@ -220,6 +220,27 @@ def profile():
     # IMPLEMENT THIS
 
 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+
+    form = UserAddForm (obj = g.user)
+    
+
+    # form = UserAddForm()
+
+    if form.validate_on_submit():
+        
+        form.populate_obj(g.user)
+        db.session.commit()
+        flash("Profile updated!", "success")
+        return redirect("/")
+
+    return render_template("users/edit.html", form=form)
+
+
+
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user."""
@@ -303,7 +324,7 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
-        
+
         return render_template('home.html', messages=messages)
 
     else:
