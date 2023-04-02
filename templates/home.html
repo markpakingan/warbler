@@ -2,12 +2,12 @@
 {% block content %}
   <div>
 
-    
+
   </div>
 
 
   <div class="row">
-
+    
     <aside class="col-md-4 col-lg-3 col-sm-12" id="home-aside">
       <div class="card user-card">
         <div>
@@ -44,11 +44,13 @@
       </div>
     </aside>
 
+
+    
     <div class="col-lg-6 col-md-8 col-sm-12">
       <ul class="list-group" id="messages">
         {% for msg in messages %}
           <li class="list-group-item">
-            <a href="/messages/{{ msg.id  }}" class="message-link"/>
+            <a href="/messages/{{ msg.id  }}" class="message-link">
             <a href="/users/{{ msg.user.id }}">
               <img src="{{ msg.user.image_url }}" alt="" class="timeline-image">
             </a>
@@ -57,7 +59,7 @@
               <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
               <p>{{ msg.text }}</p>
             </div>
-            <form method="POST" action="/users/add_like/{{ msg.id }}" id="messages-form">
+            <form method="POST" action="/messages/{{ msg.id }}/like" id="messages-form">
               <button class="
                 btn 
                 btn-sm 
@@ -66,6 +68,13 @@
                 <i class="fa fa-thumbs-up"></i> 
               </button>
             </form>
+
+            <!-- add star symbol if the user liked the message -->
+
+            <!-- {% if msg.id in likes %}
+              <span class="star">&#9733;</span>
+            {% endif %} -->
+
           </li>
         {% endfor %}
       </ul>
