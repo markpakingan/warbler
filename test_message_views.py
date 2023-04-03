@@ -71,3 +71,30 @@ class MessageViewTestCase(TestCase):
 
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
+
+
+
+    # When you’re logged in, can you see the follower / following pages for any user?
+    # When you’re logged out, are you disallowed from visiting a user’s follower / following pages?
+    # When you’re logged in, can you add a message as yourself?
+    # When you’re logged in, can you delete a message as yourself?
+    # When you’re logged out, are you prohibited from adding messages?
+    # When you’re logged out, are you prohibited from deleting messages?
+    # When you’re logged in, are you prohibiting from adding a message as another user?
+    # When you’re logged in, are you prohibiting from deleting a message as another user?
+
+    def test_add_no_session(self):
+        with self.client as c:
+            resp = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Access unauthorized", str(resp.data))
+
+    def test_add_invalid_user(self):
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = 99222224 # user does not exist
+
+            resp = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Access unauthorized", str(resp.data))
+    

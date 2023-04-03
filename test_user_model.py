@@ -32,14 +32,45 @@ db.create_all()
 class UserModelTestCase(TestCase):
     """Test views for messages."""
 
+    # def setUp(self):
+    #     """Create test client, add sample data."""
+
+    #     User.query.delete()
+    #     Message.query.delete()
+    #     Follows.query.delete()
+
+    #     self.client = app.test_client()
+
     def setUp(self):
         """Create test client, add sample data."""
+        db.drop_all()
+        db.create_all()
 
-        User.query.delete()
-        Message.query.delete()
-        Follows.query.delete()
+        u1 = User.signup("test1", "email1@email.com", "password", None)
+        uid1 = 1111
+        u1.id = uid1
+
+        u2 = User.signup("test2", "email2@email.com", "password", None)
+        uid2 = 2222
+        u2.id = uid2
+
+        db.session.commit()
+
+        u1 = User.query.get(uid1)
+        u2 = User.query.get(uid2)
+
+        self.u1 = u1
+        self.uid1 = uid1
+
+        self.u2 = u2
+        self.uid2 = uid2
 
         self.client = app.test_client()
+
+    def tearDown(self):
+        res = super().tearDown()
+        db.session.rollback()
+        return res
 
     def test_user_model(self):
         """Does basic model work?"""
@@ -57,6 +88,7 @@ class UserModelTestCase(TestCase):
         self.assertEqual(len(u.messages), 0)
         self.assertEqual(len(u.followers), 0)
 
+    
 
 
     # Does the repr method work as expected? DONE
@@ -74,17 +106,15 @@ class UserModelTestCase(TestCase):
         
         """Does is_following successfully detect when user1 is following user2?"""  
         
-        user1 = User.username = "mark"
-        user_following_list = ["lawrence", "mark", "ej", "kate"]
+        #user1 follow user2
+        self.u1.following.append(self.u2)
+        db.session.commit()
 
-        self.assertIn(user1,user_following_list)
+        # self.assertTrue(user1.is_following(user2))
+        self.assertTrue(self.u1.is_following(self.u2))
 
-
-        """Does is_following successfully detect when user1 is not following user2?"""
-        user1 = User.username = "mark"
-        user_following_list = ["lawrence", "ej", "kate"]
-
-        self.assertNotIn(user1,user_following_list)
+        """Does is_following successfully detect when user2 is not following user1?"""
+        self.assertFalse(self.u2.is_following(self.u1))
 
 
 
